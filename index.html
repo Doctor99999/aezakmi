@@ -16,6 +16,7 @@
     </style>
 </head>
 <body class="antialiased overflow-x-hidden selection:bg-emerald-500 selection:text-white">
+    <!-- Hero & terminal section -->
     <section class="pt-20 pb-20 px-6 relative max-w-4xl mx-auto">
         <div class="text-center mb-10">
             <h1 class="text-4xl font-extrabold mb-4">AEZAKMI <span class="text-emerald-500">ENTERPRISE</span></h1>
@@ -31,14 +32,15 @@
                 <div class="ml-4 text-xs font-mono text-slate-500">root@aezakmi-enterprise:~# ./audit_stream</div>
             </div>
             <div class="p-6">
-                <!-- Ссылка на облако (Боевая ссылка Render вшита сюда!) -->
-                <input type="text" id="apiUrl" value="https://aezakmi-backend.onrender.com/v1/audit" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-400 font-mono text-xs mb-4" placeholder="URL сервера" readonly>
+                <!-- Ссылка на облако (пока оставим локальную) -->
+                <input type="text" id="apiUrl" value="https://aezakmi-backend.onrender.com/v1/audit" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-400 font-mono text-xs mb-4" placeholder="URL сервера">
                 
                 <textarea id="auditInput" rows="4" class="w-full bg-slate-950/50 terminal-input border border-slate-700 rounded-xl p-4 text-slate-200 font-mono text-sm resize-none mb-4" placeholder="Type a message to scan..."></textarea>
                 
                 <button onclick="runAudit()" id="scanBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-microscope"></i> INITIATE DEEP SCAN
                 </button>
+                <!-- Блок результата -->
                 <div id="resultBox" class="mt-6 hidden rounded-xl p-6 border transition-all duration-500">
                     <div class="flex justify-between items-start mb-4">
                         <div>
@@ -72,12 +74,18 @@
             btn.classList.replace('bg-emerald-600', 'bg-slate-600');
             resBox.style.display = 'none';
             try {
+                // Запрос к серверу
                 const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-API-Key': 'aezakmi_client_01' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': 'aezakmi_client_01'
+                    },
                     body: JSON.stringify({ text: text })
                 });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
                 resBox.style.display = 'block';
                 document.getElementById('scoreVal').innerText = data.risk_score;
@@ -96,7 +104,7 @@
                     document.getElementById('scoreVal').className = "text-3xl font-black font-mono text-emerald-500";
                 }
             } catch (error) {
-                alert("Ошибка! Сервер пока не подключен. Подождите пару минут и попробуйте снова.");
+                alert("Ошибка! Сервер пока не подключен. Мы сделаем это на следующем шаге.");
             } finally {
                 btn.innerHTML = '<i class="fa-solid fa-microscope"></i> INITIATE DEEP SCAN';
                 btn.disabled = false;
